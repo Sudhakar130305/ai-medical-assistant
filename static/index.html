@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAssist AI — Medical Intelligence Assistant</title>
+    <meta name="description" content="AI-powered medical assistant. Upload medical literature and get evidence-based answers. Powered by RAG, ChromaDB, and Gemini AI.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Animated mesh gradient background -->
+    <div class="mesh-bg">
+        <div class="mesh-orb orb-1"></div>
+        <div class="mesh-orb orb-2"></div>
+        <div class="mesh-orb orb-3"></div>
+    </div>
+
+    <!-- Grain overlay for texture -->
+    <div class="grain-overlay"></div>
+
+    <div class="app-shell">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">MedAssist AI</span>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="sidebar-section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Medical Knowledge Base
+                </div>
+
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-inner">
+                        <div class="drop-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="12" y1="18" x2="12" y2="12"/>
+                                <polyline points="9 15 12 12 15 15"/>
+                            </svg>
+                        </div>
+                        <p class="drop-label">Drop medical PDF here</p>
+                        <p class="drop-hint">Research papers, clinical guidelines, textbooks</p>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf" hidden>
+                </div>
+
+                <!-- Upload Progress -->
+                <div class="upload-progress" id="upload-progress" style="display:none;">
+                    <div class="progress-header">
+                        <span class="progress-filename" id="progress-filename"></span>
+                        <span class="progress-status" id="progress-status">Processing...</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uploaded Files -->
+            <div class="sidebar-section files-section">
+                <div class="section-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Medical Documents
+                    <span class="file-count" id="file-count">0</span>
+                </div>
+                <div class="file-list" id="file-list">
+                    <div class="empty-files" id="empty-files">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <p>No medical documents yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="sidebar-footer">
+                <div class="stats-bar">
+                    <div class="stat">
+                        <span class="stat-value" id="stat-chunks">0</span>
+                        <span class="stat-label">Chunks</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-files">0</span>
+                        <span class="stat-label">Files</span>
+                    </div>
+                </div>
+                <button class="btn-clear" id="clear-chat-btn" title="Clear conversation">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Clear Chat
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <button class="btn-menu" id="menu-btn" title="Toggle sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div class="chat-title">
+                    <h1>Medical AI Assistant</h1>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Ready</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="mode-badge" id="current-mode">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        Gemini
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages -->
+            <div class="messages-container" id="chat-messages">
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-badge">
+                        <div class="welcome-icon-ring">
+                            <div class="welcome-icon">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="welcome-title">How can I help with your health question?</h2>
+                    <p class="welcome-desc">Upload medical literature (research papers, clinical guidelines, textbooks) for evidence-based answers, or ask any health question directly.</p>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" data-query="Summarize the uploaded medical document">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="17" y1="10" x2="3" y2="10"/>
+                                <line x1="21" y1="6" x2="3" y2="6"/>
+                                <line x1="21" y1="14" x2="3" y2="14"/>
+                                <line x1="17" y1="18" x2="3" y2="18"/>
+                            </svg>
+                            Medical Summary
+                        </button>
+                        <button class="quick-btn" data-query="I have the following symptoms and would like to understand what they might indicate">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                            Check Symptoms
+                        </button>
+                        <button class="quick-btn" data-query="What are common drug interactions I should know about?">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                            Drug Interactions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer Banner -->
+            <div class="disclaimer-banner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>For educational purposes only — not a substitute for professional medical advice</span>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-wrapper" id="input-wrapper">
+                        <textarea
+                            id="question-input"
+                            placeholder="Describe your symptoms or ask a medical question..."
+                            rows="1"
+                            maxlength="4000"
+                        ></textarea>
+                        <div class="input-actions">
+                            <span class="char-count" id="char-count">0 / 4000</span>
+                            <button class="btn-send" id="send-btn" title="Send message" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="input-hint">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        RAG ensures answers are grounded in your medical literature — evidence-based responses
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

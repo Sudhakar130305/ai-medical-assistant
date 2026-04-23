@@ -1,0 +1,6 @@
+flask
+pypdf
+sentence-transformers==2.2.2
+chromadb
+google-generativeai
+werkzeug
